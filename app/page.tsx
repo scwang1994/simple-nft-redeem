@@ -4,10 +4,8 @@ import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import "@fontsource/press-start-2p";
 
-const contractAddress = 'YOUR_CONTRACT_ADDRESS'; // 替換為你的合約地址
-const contractABI = [
-  // 替換為你部署的合約 ABI
-];
+import { contractABI } from './contractABI';
+const contractAddress = '0xe6B5358D47667DEa22fcA9F9515DD4398b1f3344';
 
 // 🔧 解決 TypeScript 不認得 window.ethereum 的問題
 declare global {
@@ -34,20 +32,20 @@ export default function Home() {
   }
 
   async function mintNFT() {
-    // if (!window.ethereum || !account) return;
-    // const provider = new ethers.BrowserProvider(window.ethereum);
-    // const signer = await provider.getSigner();
-    // const contract = new ethers.Contract(contractAddress, contractABI, signer);
+    if (!window.ethereum || !account) return;
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
-    // try {
-    //   const tx = await contract.mint();
-    //   setStatus('⌛ Minting NFT...');
-    //   await tx.wait();
-    //   setStatus('🎉 NFT Certificate Redeemed!');
-    // } catch (err) {
-    //   console.error(err);
-    //   setStatus('❌ Minting failed, please try again');
-    // }
+    try {
+      const tx = await contract.mint();
+      setStatus('⌛ Minting NFT...');
+      await tx.wait();
+      setStatus('🎉 NFT Certificate Redeemed!');
+    } catch (err) {
+      console.error(err);
+      setStatus('❌ Minting failed, please try again');
+    }
   }
 
   return (
