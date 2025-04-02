@@ -9,6 +9,13 @@ const contractABI = [
   // 替換為你部署的合約 ABI
 ];
 
+// 🔧 解決 TypeScript 不認得 window.ethereum 的問題
+declare global {
+  interface Window {
+    ethereum?: any;
+  }
+}
+
 export default function Home() {
   const [account, setAccount] = useState<string | null>(null);
   const [status, setStatus] = useState<string>('');
