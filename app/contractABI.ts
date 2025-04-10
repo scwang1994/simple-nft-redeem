@@ -7,46 +7,12 @@ export const contractABI = [
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "baseTokenURI",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "owner",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
     ],
-    "name": "hasMinted",
+    "name": "tokenURI",
     "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
+      { "internalType": "string", "name": "", "type": "string" }
     ],
     "stateMutability": "view",
     "type": "function"

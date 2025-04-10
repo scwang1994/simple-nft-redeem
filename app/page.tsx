@@ -3,11 +3,10 @@
 import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import "@fontsource/press-start-2p";
-
 import { contractABI } from './contractABI';
-const contractAddress = '0xe6B5358D47667DEa22fcA9F9515DD4398b1f3344';
 
-// 🔧 擴充 window.ethereum 型別
+const contractAddress = '0x4326a18c523D07642d2Eb6659983D8Ecb8806578';
+
 declare global {
   interface Window {
     ethereum?: any;
@@ -18,7 +17,6 @@ export default function Home() {
   const [account, setAccount] = useState<string | null>(null);
   const [status, setStatus] = useState<string>('');
 
-  // 監聽帳號變化
   useEffect(() => {
     if (!window.ethereum) return;
 
@@ -32,16 +30,13 @@ export default function Home() {
       }
     };
 
-    // 註冊事件
     window.ethereum.on('accountsChanged', handleAccountsChanged);
 
     return () => {
-      // 移除事件監聽
       window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
     };
   }, []);
 
-  // 🦊 初次連線
   async function connectWallet() {
     if (!window.ethereum) {
       alert('🦊 Please install MetaMask');
@@ -60,7 +55,6 @@ export default function Home() {
     }
   }
 
-  // 🎁 Mint NFT
   async function mintNFT() {
     if (!window.ethereum || !account) return;
 
@@ -71,34 +65,42 @@ export default function Home() {
     try {
       const tx = await contract.mint();
       setStatus('⌛ Minting NFT...');
-      await tx.wait();
-      setStatus('🎉 NFT Certificate Redeemed!');
-    } catch (err) {
-      console.error(err);
-      setStatus('❌ Minting failed, please try again');
+      const receipt = await tx.wait();
+
+      const event = receipt.logs
+        .map((log: { topics: ReadonlyArray<string>; data: string }) => {
+          try {
+            return contract.interface.parseLog(log);
+          } catch {
+            return null;
+          }
+        })
+        .find((parsed: any) => parsed?.name === 'Transfer');
+
+      setStatus('🎉 NFT Claimed Successfully!');
+    } catch (err: any) {
+      if (err?.message?.includes('already minted')) {
+        setStatus("⚠️ You already minted one!");
+      } else {
+        console.error(err);
+        setStatus("❌ Minting failed, please try again");
+      }
     }
   }
 
-  // 🔄 手動請求切換帳號
   async function requestAccountPermissions() {
-    if (!window.ethereum) {
-      alert('🦊 Please install MetaMask');
-      return;
-    }
+    if (!window.ethereum) return;
     try {
-      // 新 API：讓使用者選擇要連接的帳號
       await window.ethereum.request({
         method: 'wallet_requestPermissions',
         params: [{ eth_accounts: {} }],
       });
 
-      // 再次讀取最新帳號清單
       const accounts = await window.ethereum.request({
         method: 'eth_accounts',
       });
       if (accounts.length > 0) {
         setAccount(accounts[0]);
-        // setStatus(`✅ Switched to ${accounts[0]}`);
       } else {
         setAccount(null);
         setStatus('🛑 No account selected');
@@ -110,31 +112,33 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-yellow-50 text-gray-800 font-['Press Start 2P'] px-4 py-12 flex flex-col items-center justify-center">
-      <div className="border-4 border-blue-900 p-6 rounded-none shadow-[6px_6px_0px_black] bg-white max-w-md w-full text-center text-[10px]">
-        <br /><br />
-        <h1 className="text-xl text-blue-900 mb-4 border-b-4 border-blue-900 pb-2">
+    <main
+      className="min-h-screen bg-cover bg-center text-gray-800 font-['Press Start 2P'] px-4 py-12 flex flex-col items-center justify-center"
+      style={{
+        backgroundImage: "url('/cathay-bg.png')",
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center',
+      }}
+    >
+      <div className="border-4 border-green-900 p-6 rounded-none shadow-[6px_6px_0px_black] bg-white/80 backdrop-blur-sm max-w-md w-full text-center text-[10px]">
+        <h1 className="text-xl text-green-900 mb-4 border-b-4 border-green-900 pb-2">
           🎓 Redeem Your NFT
         </h1>
-        <br />
-        <p className="text-gray-700 mb-6">Cathay-NCU Certificate 2025</p>
-        <br /><br />
 
-        {/* 
-          如果尚未連接 -> 顯示連接錢包按鈕 
-          已連接 -> 顯示錢包帳號 & Mint 按鈕 
-        */}
+        <p className="text-gray-700 mb-6">Cathay-NCU Certificate 2025</p>
+
         {!account ? (
           <button
             onClick={connectWallet}
-            className="bg-blue-900 text-white py-2 px-6 border-4 border-black rounded-none shadow-[4px_4px_0px_black] hover:bg-blue-800"
+            className="bg-green-900 text-white py-2 px-6 border-4 border-black rounded-none shadow-[4px_4px_0px_black] hover:bg-green-800"
           >
             🦊 Connect Wallet
           </button>
         ) : (
           <>
             <p className="text-[9px] mb-4 text-gray-800">
-              ✅ Connected: <span className="break-all text-blue-700">{account}</span>
+              ✅ Connected: <span className="break-all text-green-700">{account}</span>
             </p>
 
             <button
@@ -144,12 +148,10 @@ export default function Home() {
               🎁 Claim NFT Certificate
             </button>
 
-            <br/><br/>
-
-            {/* 🔄 切換帳號按鈕 */}
+            <br /><br />
             <button
               onClick={requestAccountPermissions}
-              className="bg-blue-500 text-white py-2 px-4 border-4 border-black rounded-none shadow-[4px_4px_0px_black] hover:bg-blue-400"
+              className="bg-green-500 text-white py-2 px-4 border-4 border-black rounded-none shadow-[4px_4px_0px_black] hover:bg-black hover:text-green-400"
             >
               🔄 Switch Accounts
             </button>
