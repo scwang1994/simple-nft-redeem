@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 import "@fontsource/press-start-2p";
 import { contractABI } from './contractABI';
 
-const contractAddress = '0x4326a18c523D07642d2Eb6659983D8Ecb8806578';
+const contractAddress = '0xBa4164f58194489175CF6967AB60f412145C03BC';
 
 declare global {
   interface Window {
@@ -37,11 +37,58 @@ export default function Home() {
     };
   }, []);
 
+  const sepoliaChainId = '0xaa36a7'; // 十六進位 chainId for Sepolia = 11155111
+
+  async function ensureSepoliaNetwork() {
+    if (!window.ethereum) return false;
+
+    const currentChainId = await window.ethereum.request({ method: 'eth_chainId' });
+
+    if (currentChainId !== sepoliaChainId) {
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: sepoliaChainId }],
+        });
+        setStatus('🔄 Switched to Sepolia');
+      } catch (switchError: any) {
+        if (switchError.code === 4902) {
+          // 如果沒裝 Sepolia
+          try {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [{
+                chainId: sepoliaChainId,
+                chainName: 'Sepolia Test Network',
+                rpcUrls: ['https://rpc.sepolia.org'],
+                nativeCurrency: { name: 'SepoliaETH', symbol: 'ETH', decimals: 18 },
+                blockExplorerUrls: ['https://sepolia.etherscan.io'],
+              }],
+            });
+            setStatus('✅ Sepolia added & selected');
+          } catch (addError) {
+            setStatus('❌ Failed to add Sepolia network');
+            return false;
+          }
+        } else {
+          setStatus('⚠️ Please switch to Sepolia manually');
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
   async function connectWallet() {
     if (!window.ethereum) {
       alert('🦊 Please install MetaMask');
       return;
     }
+
+    const ok = await ensureSepoliaNetwork();
+    if (!ok) return;
+
     try {
       const accounts = await window.ethereum.request({
         method: 'eth_requestAccounts',
@@ -55,8 +102,15 @@ export default function Home() {
     }
   }
 
+
   async function mintNFT() {
     if (!window.ethereum || !account) return;
+    
+    const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+    if (chainId !== sepoliaChainId) {
+      setStatus('⚠️ Please switch to Sepolia before minting');
+      return;
+    }
 
     const provider = new ethers.BrowserProvider(window.ethereum);
     const signer = await provider.getSigner();
