@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 import "@fontsource/press-start-2p";
 import { contractABI } from './contractABI';
 
-const contractAddress = '0xBa4164f58194489175CF6967AB60f412145C03BC';
+const contractAddress = '0x6ECDe1CA18820aB175307932CCB3FcA7880d67b2';
 
 declare global {
   interface Window {
@@ -180,7 +180,7 @@ export default function Home() {
           🎓 Redeem Your NFT
         </h1>
 
-        <p className="text-gray-700 mb-6">Cathay-NCU Certificate 2025</p>
+        <p className="text-gray-700 mb-6">Cathay Certificate 2025</p>
 
         {!account ? (
           <button

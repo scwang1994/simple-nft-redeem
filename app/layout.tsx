@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Cathay-NCU Cert",
-  description: "Cathay-NCU Certificate 2025",
+  title: "Cathay Cert",
+  description: "Cathay Certificate 2025",
 };
 
 export default function RootLayout({

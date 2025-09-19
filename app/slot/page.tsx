@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import { contractABI } from '../contractABI';
 
-const contractAddress = '0xBa4164f58194489175CF6967AB60f412145C03BC';
+const contractAddress = '0x28ac72ab26b39e5E77CB86478F2B82e64dCcF35d';
 
 declare global {
   interface Window {
