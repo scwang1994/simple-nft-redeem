@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 import "@fontsource/press-start-2p";
 import { contractABI } from './contractABI';
 
-const contractAddress = '0x6ECDe1CA18820aB175307932CCB3FcA7880d67b2';
+const contractAddress = '0xd31A88ffB397C7a5C4C043937EE10e5dc04A1F8C';
 
 declare global {
   interface Window {
